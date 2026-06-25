@@ -1,0 +1,45 @@
+---
+deployment:
+  tasks:
+    - export APPPATH=/home/codegrav/repositories/Panel_CodeGravity
+    - export DEPLOYPATH=/home/codegrav/public_html
+    - export PHP=/opt/cpanel/ea-php84/root/usr/bin/php
+    - export LOGFILE=/home/codegrav/public_html/deployment.log
+    - export INSTALL_MARKER=/home/codegrav/public_html/storage/app/.initial-setup-completed
+
+    - echo "Deployment Started" > $LOGFILE
+    - date >> $LOGFILE
+
+    - cd $APPPATH
+    - echo "Preparing Deployment Workspace" >> $LOGFILE
+
+    - echo "Cleaning Existing Application Files" >> $LOGFILE
+    - /bin/rm -rf $DEPLOYPATH/app $DEPLOYPATH/bootstrap $DEPLOYPATH/config $DEPLOYPATH/database $DEPLOYPATH/lang $DEPLOYPATH/public $DEPLOYPATH/resources $DEPLOYPATH/routes $DEPLOYPATH/vendor >> $LOGFILE 2>&1 || true
+    - /bin/rm -f $DEPLOYPATH/artisan $DEPLOYPATH/composer.json $DEPLOYPATH/composer.lock $DEPLOYPATH/package.json $DEPLOYPATH/package-lock.json $DEPLOYPATH/phpunit.xml $DEPLOYPATH/vite.config.js >> $LOGFILE 2>&1 || true
+
+    - echo "Copying Application Files" >> $LOGFILE
+    - /bin/tar --exclude='.git' --exclude='.github' --exclude='.cpanel.yml' --exclude='.env' --exclude='.agents' --exclude='.vscode' --exclude='.idea' --exclude='node_modules' --exclude='storage' --exclude='deployment.log' --exclude='*.log' -cf - . | /bin/tar -xf - -C $DEPLOYPATH >> $LOGFILE 2>&1
+
+    - cd $DEPLOYPATH
+    -
+    - echo "Preparing Storage Directories" >> $LOGFILE
+    - /bin/mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+    - /bin/chmod -R 775 storage bootstrap/cache >> $LOGFILE 2>&1 || true
+
+    - echo "Running Database Migrations" >> $LOGFILE
+    - $PHP artisan migrate --force >> $LOGFILE 2>&1 || true
+
+    - echo "Checking Initial Setup Status" >> $LOGFILE
+    - if [ ! -f $INSTALL_MARKER ]; then echo "Running Initial Setup Tasks" >> $LOGFILE; $PHP artisan db:seed --force >> $LOGFILE 2>&1 && touch $INSTALL_MARKER && echo "Initial Setup Completed" >> $LOGFILE; else echo "Initial Setup Already Completed - Skipping Seeders" >> $LOGFILE; fi
+
+    - echo "Clearing Application Cache" >> $LOGFILE
+    - $PHP artisan optimize:clear >> $LOGFILE 2>&1 || true
+
+    - echo "Creating Storage Symbolic Link" >> $LOGFILE
+    - $PHP artisan storage:link >> $LOGFILE 2>&1 || true
+
+    - echo "Optimizing Application" >> $LOGFILE
+    - $PHP artisan optimize >> $LOGFILE 2>&1 || true
+
+    - echo "Deployment Completed Successfully" >> $LOGFILE
+    - date >> $LOGFILE
