@@ -1,0 +1,15 @@
+/node_modules
+/.env
+/.agents
+/.vscode
+/.idea
+/public/storage
+
+/storage/*.key
+/storage/app/private/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+/bootstrap/cache/*.php
