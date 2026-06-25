@@ -30,6 +30,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /*
+         * Shared hosting / eski MySQL-MariaDB kurulumlarında
+         * utf8mb4 unique index uzunluğu hatasını önler.
+         *
+         * SQLSTATE[42000]: 1071 Specified key was too long
+         */
+        Schema::defaultStringLength(191);
+
         Validator::resolver(function ($translator, $data, $rules, $messages, $customAttributes) {
             return new class($translator, $data, $rules, $messages, $customAttributes) extends BaseValidator {
                 protected function getMessage($attribute, $rule)
