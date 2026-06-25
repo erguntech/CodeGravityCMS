@@ -1,5 +1,4 @@
-**# CodeGravity CMS Admin Panel
-
+## CodeGravity CMS Admin Panel
 Modern Laravel altyapısı ile geliştirilmiş, kurumsal web siteleri için yönetim paneli ve içerik yönetim sistemidir.
 
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-red?style=for-the-badge&logo=laravel)
