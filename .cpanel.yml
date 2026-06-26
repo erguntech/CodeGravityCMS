@@ -23,6 +23,9 @@ deployment:
 
     - cd $DEPLOYPATH
 
+    - echo "Checking Application Key" >> $LOGFILE
+    - if grep -q "^APP_KEY=$" .env || ! grep -q "^APP_KEY=" .env; then echo "Generating Application Key" >> $LOGFILE; $PHP artisan key:generate --force >> $LOGFILE 2>&1; else echo "Application Key Already Exists" >> $LOGFILE; fi
+
     - echo "Preparing Storage Directories" >> $LOGFILE
     - /bin/mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
     - /bin/chmod -R 775 storage bootstrap/cache >> $LOGFILE 2>&1 || true
