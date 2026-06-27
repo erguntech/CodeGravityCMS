@@ -80,6 +80,10 @@ class RolePermissionSeeder extends Seeder
             'api_access.view',
             'systemsettings.view',
             'systemsettings.manage',
+            
+            // Güncellemeler
+            'updates.view',
+            'updates.manage',
         ];
 
         // 2. Create permissions

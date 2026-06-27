@@ -23,6 +23,9 @@ deployment:
 
     - cd $DEPLOYPATH
 
+    - echo "Fixing Public HTML Permission" >> $LOGFILE
+    - /bin/chmod 750 $DEPLOYPATH >> $LOGFILE 2>&1 || true
+
     - echo "Preparing Storage Directories" >> $LOGFILE
     - /bin/mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
     - /bin/chmod -R 775 storage bootstrap/cache >> $LOGFILE 2>&1 || true
@@ -46,6 +49,11 @@ deployment:
 
     - echo "Creating Storage Symbolic Link" >> $LOGFILE
     - $PHP artisan storage:link >> $LOGFILE 2>&1 || true
+
+    - echo "Fixing Final Permissions" >> $LOGFILE
+    - /bin/chmod 750 $DEPLOYPATH >> $LOGFILE 2>&1 || true
+    - /bin/chmod -R 775 $DEPLOYPATH/storage $DEPLOYPATH/bootstrap/cache >> $LOGFILE 2>&1 || true
+    - /bin/chmod 600 $DEPLOYPATH/.env >> $LOGFILE 2>&1 || true
 
     - echo "Optimizing Application" >> $LOGFILE
     - $PHP artisan optimize >> $LOGFILE 2>&1 || true
