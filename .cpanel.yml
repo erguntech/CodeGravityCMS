@@ -23,21 +23,26 @@ deployment:
 
     - cd $DEPLOYPATH
 
-    - echo "Checking Application Key" >> $LOGFILE
-    - if grep -q "^APP_KEY=$" .env || ! grep -q "^APP_KEY=" .env; then echo "Generating Application Key" >> $LOGFILE; $PHP artisan key:generate --force >> $LOGFILE 2>&1; else echo "Application Key Already Exists" >> $LOGFILE; fi
-
     - echo "Preparing Storage Directories" >> $LOGFILE
     - /bin/mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
     - /bin/chmod -R 775 storage bootstrap/cache >> $LOGFILE 2>&1 || true
 
+    - echo "Checking Environment File" >> $LOGFILE
+    - if [ ! -f .env ]; then echo ".env file not found in $DEPLOYPATH" >> $LOGFILE; exit 1; fi
+    - /bin/chmod 664 .env >> $LOGFILE 2>&1 || true
+    - /bin/sed -i 's/\r$//' .env
+
+    - echo "Checking Application Key" >> $LOGFILE
+    - if ! grep -Eq "^APP_KEY=base64:.+" .env; then echo "Generating Application Key" >> $LOGFILE; $PHP artisan key:generate --force >> $LOGFILE 2>&1; else echo "Application Key Already Exists" >> $LOGFILE; fi
+
+    - echo "Clearing Old Application Cache" >> $LOGFILE
+    - $PHP artisan optimize:clear >> $LOGFILE 2>&1 || true
+
     - echo "Running Database Migrations" >> $LOGFILE
-    - $PHP artisan migrate --force >> $LOGFILE 2>&1 || true
+    - $PHP artisan migrate --force >> $LOGFILE 2>&1
 
     - echo "Checking Initial Setup Status" >> $LOGFILE
     - if [ ! -f $INSTALL_MARKER ]; then echo "Running Initial Setup Tasks" >> $LOGFILE; $PHP artisan db:seed --force >> $LOGFILE 2>&1 && touch $INSTALL_MARKER && echo "Initial Setup Completed" >> $LOGFILE; else echo "Initial Setup Already Completed - Skipping Initial Tasks" >> $LOGFILE; fi
-
-    - echo "Clearing Application Cache" >> $LOGFILE
-    - $PHP artisan optimize:clear >> $LOGFILE 2>&1 || true
 
     - echo "Creating Storage Symbolic Link" >> $LOGFILE
     - $PHP artisan storage:link >> $LOGFILE 2>&1 || true
