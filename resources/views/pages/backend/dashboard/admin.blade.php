@@ -18,7 +18,7 @@
         <div class="alert alert-dismissible bg-light-primary border border-primary d-flex align-items-center p-5 mb-4">
             <i class="ki-duotone ki-notification-on fs-2hx text-primary me-4"><span class="path1"></span><span class="path2"></span></i>
             <div class="d-flex flex-column pe-0 pe-sm-10">
-                <h4 class="fw-semibold text-primary">{{ __('Sn.') }} {{ auth()->user()->name }}, {{ __('Hoş Geldiniz!') }}</h4>
+                <h4 class="fw-semibold text-primary">{{ __('Sn.') }} <span class="text-warning">{{ auth()->user()->name }}</span>, {{ __('Hoş Geldiniz!') }}</h4>
                 <span>{{ __('Tüm müşteri ve sistem yönetimini bu alandan sağlayabilirsiniz.') }}</span>
             </div>
             <button type="button" class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto" data-bs-dismiss="alert">
