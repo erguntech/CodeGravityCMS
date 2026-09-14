@@ -78,7 +78,7 @@
         <h1 class="text-gray-900 fw-bolder mb-3" style="font-size: 1.50rem;">İçerik Yönetim Paneli</h1>
         <!--end::Title-->
         <!--begin::Subtitle-->
-        <div class="text-gray-500 fw-semibold fs-6">Sisteme erişmek için kullanıcı bilgilerinizi giriniz.</div>
+        <div class="text-gray-500 fw-semibold fs-6">Sisteme erişmek için lütfen kullanıcı bilgilerinizi giriniz.</div>
         <!--end::Subtitle=-->
     </div>
     <!--begin::Heading-->
