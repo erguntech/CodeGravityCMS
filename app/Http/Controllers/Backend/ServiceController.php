@@ -124,7 +124,7 @@ class ServiceController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'service_category_id' => 'required|exists:service_categories,id',
+            'service_category_id' => ['required', $this->existsForClient('service_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'status' => 'required|in:active,passive',
@@ -180,7 +180,7 @@ class ServiceController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'service_category_id' => 'required|exists:service_categories,id',
+            'service_category_id' => ['required', $this->existsForClient('service_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'status' => 'required|in:active,passive',
@@ -287,6 +287,10 @@ class ServiceController extends Controller implements HasMiddleware
 
     public function destroyGallery(Service $service, ServiceGallery $image)
     {
+        if ((int) $image->service_id !== (int) $service->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

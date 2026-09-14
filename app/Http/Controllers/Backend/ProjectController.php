@@ -124,7 +124,7 @@ class ProjectController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'project_category_id' => 'required|exists:project_categories,id',
+            'project_category_id' => ['required', $this->existsForClient('project_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'status' => 'required|in:active,passive',
@@ -180,7 +180,7 @@ class ProjectController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'project_category_id' => 'required|exists:project_categories,id',
+            'project_category_id' => ['required', $this->existsForClient('project_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'status' => 'required|in:active,passive',
@@ -287,6 +287,10 @@ class ProjectController extends Controller implements HasMiddleware
 
     public function destroyGallery(Project $project, ProjectGallery $image)
     {
+        if ((int) $image->project_id !== (int) $project->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

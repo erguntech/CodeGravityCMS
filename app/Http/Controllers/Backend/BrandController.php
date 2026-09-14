@@ -269,6 +269,10 @@ class BrandController extends Controller implements HasMiddleware
 
     public function destroyGallery(Brand $brand, BrandGallery $image)
     {
+        if ((int) $image->brand_id !== (int) $brand->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

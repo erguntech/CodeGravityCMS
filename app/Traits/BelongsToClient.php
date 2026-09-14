@@ -9,6 +9,17 @@ trait BelongsToClient
 {
     protected static function bootBelongsToClient()
     {
+        // A Client-role user can only ever write into their own client account.
+        // This overrides any client_id that arrives via mass assignment from a form.
+        static::saving(function ($model) {
+            if (auth()->check() && auth()->user()->hasRole('Client')) {
+                $ownClientId = auth()->user()->client?->id;
+                if ($ownClientId) {
+                    $model->client_id = $ownClientId;
+                }
+            }
+        });
+
         static::creating(function ($model) {
             if (empty($model->client_id) && auth()->check() && auth()->user()->client) {
                 $model->client_id = auth()->user()->client->id;

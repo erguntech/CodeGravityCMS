@@ -124,7 +124,7 @@ class ProductController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'product_category_id' => 'required|exists:product_categories,id',
+            'product_category_id' => ['required', $this->existsForClient('product_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
@@ -184,7 +184,7 @@ class ProductController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'product_category_id' => 'required|exists:product_categories,id',
+            'product_category_id' => ['required', $this->existsForClient('product_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
@@ -295,6 +295,10 @@ class ProductController extends Controller implements HasMiddleware
 
     public function destroyGallery(Product $product, ProductGallery $image)
     {
+        if ((int) $image->product_id !== (int) $product->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

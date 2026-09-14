@@ -32,6 +32,14 @@
         'news'               => ['title' => 'Haber Manşet Resmi',              'color' => 'success', 'icon' => 'ki-notepad'],
         'reference'          => ['title' => 'Referans Manşet Resmi',           'color' => 'warning', 'icon' => 'ki-briefcase'],
         'brand'              => ['title' => 'Marka Manşet Resmi',              'color' => 'success', 'icon' => 'ki-tag'],
+        'product_gallery'    => ['title' => 'Ürün Galeri Resmi',                'color' => 'danger',  'icon' => 'ki-picture'],
+        'project_gallery'    => ['title' => 'Proje Galeri Resmi',               'color' => 'primary', 'icon' => 'ki-picture'],
+        'blog_post_gallery'  => ['title' => 'Blog Yazısı Galeri Resmi',         'color' => 'info',    'icon' => 'ki-picture'],
+        'service_gallery'    => ['title' => 'Hizmet Galeri Resmi',              'color' => 'dark',    'icon' => 'ki-picture'],
+        'news_gallery'       => ['title' => 'Haber Galeri Resmi',               'color' => 'success', 'icon' => 'ki-picture'],
+        'media_gallery'      => ['title' => 'Medya Galeri Resmi',               'color' => 'info',    'icon' => 'ki-picture'],
+        'reference_gallery'  => ['title' => 'Referans Galeri Resmi',            'color' => 'warning', 'icon' => 'ki-picture'],
+        'brand_gallery'      => ['title' => 'Marka Galeri Resmi',               'color' => 'success', 'icon' => 'ki-picture'],
     ];
 @endphp
 

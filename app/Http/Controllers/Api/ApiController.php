@@ -40,7 +40,15 @@ class ApiController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        $languages = $client->languages()->where('is_active', true)->get(['name', 'code', 'is_default', 'icon']);
+        $languages = $client->languages()->where('is_active', true)->get(['code', 'is_default'])->map(function ($lang) {
+            $meta = config('languages.' . $lang->code, []);
+            return [
+                'code'       => $lang->code,
+                'name'       => $meta['name'] ?? strtoupper($lang->code),
+                'icon'       => isset($meta['icon']) ? asset($meta['icon']) : null,
+                'is_default' => (bool) $lang->is_default,
+            ];
+        })->values();
 
         return response()->json([
             'status' => 'success',

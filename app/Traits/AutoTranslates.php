@@ -3,10 +3,19 @@
 namespace App\Traits;
 
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 trait AutoTranslates
 {
+    /**
+     * After the translation endpoint fails (typically 429 Too Many Requests) we stop
+     * calling it for this long, so every save does not pay a network round trip.
+     */
+    protected static int $autoTranslateBackoffMinutes = 15;
+
+    protected static string $autoTranslateBackoffKey = 'auto_translate_backoff_until';
+
     /**
      * Boot the auto translates trait for a model.
      *
@@ -35,6 +44,10 @@ trait AutoTranslates
                 return;
             }
 
+            if (Cache::has(static::$autoTranslateBackoffKey)) {
+                return;
+            }
+
             $languages = $client->languages()->where('is_active', true)->get();
             if ($languages->isEmpty()) {
                 return;
@@ -60,7 +73,7 @@ trait AutoTranslates
                 // Orjinal verileri al (değişiklik kontrolü için)
                 $original = $model->getOriginal($attribute);
                 $originalArray = is_string($original) ? json_decode($original, true) : (is_array($original) ? $original : []);
-                
+
                 $oldDefaultText = $originalArray[$defaultLang] ?? null;
                 $defaultTextChanged = ($defaultText !== $oldDefaultText);
 
@@ -72,7 +85,7 @@ trait AutoTranslates
 
                     $currentLangText = $translations[$langCode] ?? '';
                     $oldLangText = $originalArray[$langCode] ?? '';
-                    
+
                     $langTextChanged = ($currentLangText !== $oldLangText);
                     $isEmpty = empty(trim($currentLangText));
 
@@ -87,7 +100,15 @@ trait AutoTranslates
                             $translations[$langCode] = $translatedText;
                             $dirty = true;
                         } catch (\Exception $e) {
-                            Log::error("Otomatik çeviri hatası ({$defaultLang} -> {$langCode}): " . $e->getMessage());
+                            Log::error("Otomatik çeviri hatası ({$defaultLang} -> {$langCode}): " . $e->getMessage()
+                                . " — otomatik çeviri " . static::$autoTranslateBackoffMinutes . " dakika devre dışı bırakıldı.");
+                            Cache::put(static::$autoTranslateBackoffKey, now()->toDateTimeString(), now()->addMinutes(static::$autoTranslateBackoffMinutes));
+
+                            if ($dirty) {
+                                $model->setTranslations($attribute, $translations);
+                            }
+
+                            return;
                         }
                     }
                 }

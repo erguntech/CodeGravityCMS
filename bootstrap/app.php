@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\LanguageMiddleware::class,
+            \App\Http\Middleware\EnsureUserIsActive::class,
         ]);
 
         $middleware->api(append: [
@@ -36,7 +37,12 @@ return Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (TokenMismatchException $e, Request $request) {
+        // Laravel converts TokenMismatchException into an HttpException(419) before render callbacks run.
+        $exceptions->render(function (HttpExceptionInterface $e, Request $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
+
             if ($request->expectsJson() || $request->isXmlHttpRequest() || $request->ajax()) {
                 return response()->json([
                     'message' => 'Unauthenticated',

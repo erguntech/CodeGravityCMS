@@ -108,6 +108,7 @@ class ClientController extends Controller implements HasMiddleware
             'company_name' => 'required|string|max:255',
             'languages' => 'required|array|min:1',
             'languages.*' => 'string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [], [
             'name' => __('Ad Soyad'),
             'email' => __('E-posta'),
@@ -191,6 +192,7 @@ class ClientController extends Controller implements HasMiddleware
             'company_name' => 'required|string|max:255',
             'languages' => 'required|array|min:1',
             'languages.*' => 'string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [], [
             'name' => __('Ad Soyad'),
             'email' => __('E-posta'),
@@ -251,7 +253,7 @@ class ClientController extends Controller implements HasMiddleware
             
             // Ensure at least one default exists if there are languages
             if ($clientModel->languages()->count() > 0 && !$clientModel->languages()->where('is_default', true)->exists()) {
-                $clientModel->languages()->first()->update(['is_default' => true]);
+                $clientModel->languages()->where('code', $newLangs[0])->first()?->update(['is_default' => true, 'is_active' => true]);
             }
         } else {
             $clientModel->languages()->delete();

@@ -30,7 +30,7 @@ class ClientLanguageController extends Controller
         $request->validate([
             'languages' => 'nullable|array',
             'languages.*.is_active' => 'nullable|boolean',
-            'default_language' => 'required|string|exists:client_languages,code',
+            'default_language' => ['required', 'string', \Illuminate\Validation\Rule::exists('client_languages', 'code')->where('client_id', $user->client->id)],
             'auto_translate' => 'required|boolean',
         ]);
 

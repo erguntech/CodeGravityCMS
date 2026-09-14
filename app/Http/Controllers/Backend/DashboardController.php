@@ -76,6 +76,7 @@ class DashboardController extends Controller
                 ['key' => 'news_management',      'title' => 'Haberler',          'icon' => 'ki-abstract-41', 'color' => 'danger'],
                 ['key' => 'welcome_message',      'title' => 'Açılış Mesajı',     'icon' => 'ki-abstract-44', 'color' => 'primary'],
                 ['key' => 'reference_management', 'title' => 'Referans Yönetimi', 'icon' => 'ki-abstract-47', 'color' => 'warning'],
+                ['key' => 'brand_management',     'title' => 'Marka Yönetimi',    'icon' => 'ki-tag',         'color' => 'success'],
             ];
 
             // Son 14 gün ziyaretçi istatistikleri

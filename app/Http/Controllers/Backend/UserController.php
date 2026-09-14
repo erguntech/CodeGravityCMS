@@ -202,6 +202,12 @@ class UserController extends Controller implements HasMiddleware
         if ($user->id === auth()->id()) {
             return response()->json(['status' => 'error', 'message' => __('Kendi hesabınızı silemezsiniz!')]);
         }
+        if ($user->id === 1) {
+            return response()->json(['status' => 'error', 'message' => __('Ana yönetici hesabı silinemez!')]);
+        }
+        if ($user->user_type === 'Admin' && auth()->id() !== 1) {
+            return response()->json(['status' => 'error', 'message' => __('Yönetici hesaplarını yalnızca ana yönetici silebilir!')]);
+        }
 
         try {
             $user->delete();

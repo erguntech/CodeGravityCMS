@@ -221,6 +221,14 @@ class MediaController extends Controller implements HasMiddleware
             $lastSortOrder++;
             $path = $file->store('media/gallery', 'public');
 
+            $client = auth()->user()->client;
+            if ($client) {
+                $size = $client->getImageSize('media_gallery');
+                if ($size) {
+                    \App\Helpers\ImageHelper::resizeAndCrop(Storage::disk('public')->path($path), $size['width'], $size['height']);
+                }
+            }
+
 
 
             MediaGallery::create([
@@ -235,6 +243,10 @@ class MediaController extends Controller implements HasMiddleware
 
     public function destroyGallery(Media $media, MediaGallery $image)
     {
+        if ((int) $image->media_id !== (int) $media->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

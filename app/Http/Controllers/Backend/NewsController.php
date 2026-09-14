@@ -285,6 +285,10 @@ class NewsController extends Controller implements HasMiddleware
 
     public function destroyGallery(News $news, NewsGallery $image)
     {
+        if ((int) $image->news_id !== (int) $news->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

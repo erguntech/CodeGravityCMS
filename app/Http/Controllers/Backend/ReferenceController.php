@@ -269,6 +269,10 @@ class ReferenceController extends Controller implements HasMiddleware
 
     public function destroyGallery(Reference $reference, ReferenceGallery $image)
     {
+        if ((int) $image->reference_id !== (int) $reference->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();

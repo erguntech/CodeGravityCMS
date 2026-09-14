@@ -124,7 +124,7 @@ class BlogPostController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'blog_post_category_id' => 'required|exists:blog_post_categories,id',
+            'blog_post_category_id' => ['required', $this->existsForClient('blog_post_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'status' => 'required|in:active,passive',
@@ -180,7 +180,7 @@ class BlogPostController extends Controller implements HasMiddleware
             'title' => 'required|array',
             'title.' . $clientDefaultLang => 'required|string|max:255',
             'title.*' => 'nullable|string|max:255',
-            'blog_post_category_id' => 'required|exists:blog_post_categories,id',
+            'blog_post_category_id' => ['required', $this->existsForClient('blog_post_categories')],
             'description' => 'nullable|array',
             'description.*' => 'nullable|string',
             'status' => 'required|in:active,passive',
@@ -287,6 +287,10 @@ class BlogPostController extends Controller implements HasMiddleware
 
     public function destroyGallery(BlogPost $blog_post, BlogPostGallery $image)
     {
+        if ((int) $image->blog_post_id !== (int) $blog_post->id) {
+            abort(404);
+        }
+
         try {
             Storage::disk('public')->delete($image->image);
             $image->delete();
